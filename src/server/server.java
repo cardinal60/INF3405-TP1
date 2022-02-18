@@ -1,6 +1,8 @@
 package server;
 
 import java.util.Scanner;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -8,37 +10,63 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Server {
-	
+public class server {
+	private LoginManager loginManager = new LoginManager();
 	public static ServerSocket listener;
+	private static Scanner userInput = new Scanner(System.in);
 	
-	
+	private String[] initialValidation() {
+		try {
+		// Création d'un canal sortant pour envoyer des messages au client
+			
+		String[] serverInfo = new String [2];
+		Scanner input = new Scanner(System.in);
+		
+		
+
+		System.out.println("Please Enter the servers ip address");
+		String serverIP = input.nextLine();
+		
+		serverInfo[0] = serverIP;
+		
+		this.loginManager.validateIP(serverIP);
+		
+		System.out.println("Now, Please Enter the servers Port");
+		
+		String serverPort = input.nextLine();
+		
+		serverInfo[1] = serverPort;
+		
+		this.loginManager.validatePort(serverPort);
+		
+		return serverInfo;
+			
+		} catch(Exception error) {
+			
+			System.out.println(error.toString());
+		}
+		return null;
+		
+		
+	}
+
 	
 	public static void main(String[] args) throws Exception {
 		// Compteur incrémenté à chaque connexion d'un client au serveur 
+		server server = new server();
 		int clientNumber = 0;
-		
-		// Addresse er port du serveur
-		String serverAddress = "127.0.0.3";
-		int serverPort = 5000;
-		
-		// Création de la connexion pour communiquer avec les clients
+		String[] serverInfo = server.initialValidation();
 		listener = new ServerSocket();
 		listener.setReuseAddress(true);
-		InetAddress serverIP = InetAddress.getByName(serverAddress);
-		
-		// Association de l'adresse et du port à la connexion
-		listener.bind(new InetSocketAddress(serverIP, serverPort));
-		
-		System.out.format("The server is running on %s:%d%n", serverAddress, serverPort);
+		listener.bind(new InetSocketAddress(InetAddress.getByName(serverInfo[0]), Integer.parseInt(serverInfo[1])));		
+		System.out.format("The server is running on %s:%d%n", serverInfo[0], Integer.parseInt(serverInfo[1]));
 		
 		try {
 			/* À chaque fois qu'un client se connecte, on exécute la fonction Run() de l'objet ClientHandler */ 
 			
 			while(true) {
-				// Important : la fonction accept() est bloquante : attend qu'un prochain client se connecte 
-				// Une nouvelle connection : on incrémente le compteur clientNumber
-				new ClientHandler(listener.accept(), clientNumber++).start();
+				
+				new ClientHandler(listener.accept(), ++clientNumber).start();
 			}
 		}
 		finally {
@@ -46,6 +74,7 @@ public class Server {
 			listener.close();
 		}
 	}
+	
 	
 	/* Une thread qui se charge de traiter la demainde de chaque client sur un socket particulier */
 	private static class ClientHandler extends Thread {
@@ -58,6 +87,10 @@ public class Server {
 			this.clientNumber = clientNumber;
 			this.loginManager = new LoginManager();
 			System.out.println("New connection with client#" + clientNumber + "at" + socket);
+			
+			//this.loginManager.validateUserInfos(socket.getInputStream());
+			
+			this.run();
 		}
 		
 		/* Une thread se charge d'envoyer au client un message de bienvenue */
@@ -65,25 +98,26 @@ public class Server {
 			try {
 				// Création d'un canal sortant pour envoyer des messages au client
 				System.out.print("cancer");
-				var out = new PrintWriter(socket.getOutputStream());
-				var in = new Scanner(socket.getInputStream());
-				out.println("Hello from server - you are client#" + clientNumber);
-				initialValidation();
+				DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+				out.writeUTF("Hello from server - you are client#" + clientNumber + "\nPlase enter your userName: ");
 				
-				String[] clientInfo = new String[4];
+				DataInputStream in = new DataInputStream(socket.getInputStream());
+				String userName = in.readUTF();
+				System.out.print(userName);
 				
-				int i = 0;
-				while(in.hasNextLine()) {
-					clientInfo[i] = in.nextLine();
-					i++;
-				}
+				
+				out.writeUTF("Please enter your password:");
+				String password = in.readUTF();
+				System.out.print(password);
+				
+				String[] clientInfo = new String[3];
+				clientInfo[0] = userName;
+				clientInfo[1] = password;
+				
 				
 				this.loginManager.compareData(clientInfo, socket.getInetAddress(), socket.getPort());
 				System.out.print("cancer");
-				
-				
-				
-				
+
 				
 			}
 			catch (IOException | BadLoginInfoException e){
@@ -102,34 +136,6 @@ public class Server {
 			}
 		}
 		
-		private void initialValidation() {
-			try {
-			// Création d'un canal sortant pour envoyer des messages au client
-			Scanner input = new Scanner(socket.getInputStream());
-			PrintWriter output = new PrintWriter(socket.getOutputStream());
-			
-			
-	
-			output.println("Please Enter the servers ip address");
-			String serverIP = input.nextLine();
-			
-			this.loginManager.validateIP(serverIP);
-			
-			output.println("Now, Please Enter the servers Port");
-			
-			String serverPort = input.nextLine();
-			
-			this.loginManager.validatePort(serverPort);
-				
-			} catch(Exception error) {
-				
-				System.out.println(error.toString());
-			}
-			
-			
-			
-			
-		}
 	}
 }
 

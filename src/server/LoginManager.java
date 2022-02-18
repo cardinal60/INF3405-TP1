@@ -47,27 +47,36 @@ public class LoginManager {
 		}
 	}
 	
-	public void compareData(String[] loginInfo, InetAddress ip, int port) throws BadLoginInfoException {
+	public void compareData(String[] clientInfo, InetAddress ip, int port) throws BadLoginInfoException {
 		
-		boolean invalidIp = loginInfo[0] != ip.getHostAddress();
+		boolean invalidIp = clientInfo[0] != ip.getHostAddress();
 		if (invalidIp) {
 			throw new BadLoginInfoException("the given IP adress is not the servers Ip adress");
 		}
 		
-		boolean invalidPort = Integer.parseInt(loginInfo[1]) != port;
+		boolean invalidPort = Integer.parseInt(clientInfo[1]) != port;
 		if (invalidPort) {
 			throw new BadLoginInfoException("the given port number is not the servers Port number");
 		}
 		
-		boolean invalidUsername = loginInfo[2] != "walrus";
+		boolean invalidUsername = clientInfo[2] != "walrus";
 		if (invalidUsername) {
 			throw new BadLoginInfoException("the given username is not recognised by the server");
 		}
 		
-		boolean invalidPassword = loginInfo[3] != "admin";
+		boolean invalidPassword = clientInfo[3] != "admin";
 		if (invalidPassword) {
 			throw new BadLoginInfoException("the password does not match the username");
 		}
 	}
+	
+	public void validateUserInfos(String[] clientInfo) throws BadLoginInfoException {
+			String userName = clientInfo[2];
+			String password = clientInfo[3];
+			
+			System.out.println("Verifying user: " + userName);
+			System.out.println("password given is: " + password);
+			
+		}
 
 }
