@@ -13,13 +13,7 @@ public class LoginManager {
 		int expectedLenght = 4;
 		int[] response = new int[expectedLenght];
 		String[] ipParts = ip.split("\\.");
-		System.out.println(ipParts[0]);
-		System.out.println(ipParts[1]);
-		System.out.println(ipParts[2]);
-		
 		boolean isIncorrectLenght = ipParts.length != expectedLenght;
-		System.out.println(isIncorrectLenght);
-		System.out.println(ipParts.length);
 		
 		if (isIncorrectLenght) {
 			throw new InvalidIpException("given Ip address does not have correct amount of bytes");

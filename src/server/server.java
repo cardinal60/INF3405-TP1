@@ -103,30 +103,37 @@ public class server {
 				
 				DataInputStream in = new DataInputStream(socket.getInputStream());
 				String userName = in.readUTF();
-				System.out.print(userName);
+				System.out.println(userName);
 				
 				
 				out.writeUTF("Please enter your password:");
 				String password = in.readUTF();
-				System.out.print(password);
+				System.out.println(password);
 				
-				String[] clientInfo = new String[3];
+				String[] clientInfo = new String[2];
 				clientInfo[0] = userName;
 				clientInfo[1] = password;
 				
+				String valitationResult = loginManager.validateUserInfos(clientInfo);
 				
-				this.loginManager.compareData(clientInfo, socket.getInetAddress(), socket.getPort());
+				if(valitationResult == "success" || valitationResult == "account created") {
+					out.writeUTF("Successfully connected to chat-room !");
+				}
+				else {
+					out.writeUTF("Wrong password !");
+				}
+				
+				//this.loginManager.compareData(clientInfo, socket.getInetAddress(), socket.getPort());
 				System.out.print("cancer");
 
 				
 			}
-			catch (IOException | BadLoginInfoException e){
+			catch (IOException e){
 				
 				System.out.println("Error handling client#" + clientNumber + ":" + e);
 			}
 			finally {
 				try {
-					// Fermeture de la connexion avec le client
 					socket.close();
 				}
 				catch(IOException e) {

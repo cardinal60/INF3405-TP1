@@ -1,8 +1,16 @@
 package server;
 import java.util.Scanner;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 
@@ -70,13 +78,55 @@ public class LoginManager {
 		}
 	}
 	
-	public void validateUserInfos(String[] clientInfo) throws BadLoginInfoException {
-			String userName = clientInfo[2];
-			String password = clientInfo[3];
+	public String validateUserInfos(String[] clientInfo) {
 			
-			System.out.println("Verifying user: " + userName);
-			System.out.println("password given is: " + password);
-			
+			try  {
+				
+				String userName = clientInfo[0];
+				String password = clientInfo[1];
+				
+				System.out.println("Verifying user: " + userName);
+				System.out.println("password given is: " + password);
+				
+				
+				String line;
+				Boolean userFound = false;
+				/*File file = new File("src");
+				for(String fileNames : file.list()) System.out.println(fileNames);
+				*/
+				File myObj = new File("src/accounts.txt");
+			      Scanner myReader = new Scanner(myObj);
+				
+				while ( myReader.hasNextLine())   {
+					line = myReader.nextLine();
+					String[] s = line.split(":");
+				  System.out.println (line);
+				  
+				  if(s[0].equals(userName)) {
+					  if (s[1].equals(password)) {
+						  return "success";
+					  }
+					  return "wrong password";
+					}
+				  
+				}
+				if(!userFound) {
+					BufferedWriter writer = new BufferedWriter(new FileWriter("src/accounts.txt"));
+				    writer.write(userName + ":" + password);
+				    writer.close();
+				    return "account created";
+				}
+				myReader.close();
+				
+				return "success";
+			} catch (IOException e){
+				System.out.println(e);
+			}
+			finally {
+				
+			}
+
+			return null;
 		}
 
 }

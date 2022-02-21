@@ -18,20 +18,15 @@ public class client {
 	
 	private String[] initialValidation() {
 		try {
-		// Création d'un canal sortant pour envoyer des messages au client
-			System.out.println("cancre3\\n");
 			PrintWriter out = new PrintWriter(System.out);
 			Scanner in = new Scanner(System.in);
 			String[] loginInfo = new String[4]; 
-			// Envoi d'un message au client
-			System.out.println("cancre4\\n");
 		
 			System.out.println("Please Enter the servers ip address :)");
 			loginInfo[0] = in.nextLine();
 			System.out.println(loginInfo[0]);
 			
 			this.loginManager.validateIP(loginInfo[0]);
-			System.out.println("cancre5");
 			System.out.println("Now, Please Enter the servers Port");
 			
 			loginInfo[1] = in.nextLine();
@@ -74,6 +69,9 @@ public class client {
 		
 		String helloMessageFromServer = in.readUTF();
 		System.out.println(helloMessageFromServer);
+		
+		String loginResult = in.readUTF();
+		System.out.println(loginResult);
 		
 	}
 	
