@@ -1,5 +1,6 @@
 package server;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -18,12 +19,10 @@ public class server {
 	private String[] initialValidation() {
 		try {
 		// Création d'un canal sortant pour envoyer des messages au client
-			
+
 		String[] serverInfo = new String [2];
 		Scanner input = new Scanner(System.in);
 		
-		
-
 		System.out.println("Please Enter the servers ip address");
 		String serverIP = input.nextLine();
 		
@@ -63,10 +62,10 @@ public class server {
 		
 		try {
 			/* À chaque fois qu'un client se connecte, on exécute la fonction Run() de l'objet ClientHandler */ 
-			
-			while(true) {
-				
-				new ClientHandler(listener.accept(), ++clientNumber).start();
+			while(!listener.isClosed()) {
+				ClientHandler clientHandler = new ClientHandler(listener.accept(), ++clientNumber);
+				Thread thread = new Thread(clientHandler);
+				thread.start();
 			}
 		}
 		finally {
@@ -75,76 +74,9 @@ public class server {
 		}
 	}
 	
-	
-	/* Une thread qui se charge de traiter la demainde de chaque client sur un socket particulier */
-	private static class ClientHandler extends Thread {
-		private Socket socket;
-		private int clientNumber;
-		private LoginManager loginManager;
-		
-		public ClientHandler(Socket socket, int clientNumber) {
-			this.socket = socket;
-			this.clientNumber = clientNumber;
-			this.loginManager = new LoginManager();
-			System.out.println("New connection with client#" + clientNumber + "at" + socket);
-			
-			//this.loginManager.validateUserInfos(socket.getInputStream());
-			
-			this.run();
-		}
-		
-		/* Une thread se charge d'envoyer au client un message de bienvenue */
-		public void run() {
-			try {
-				// Création d'un canal sortant pour envoyer des messages au client
-				System.out.print("cancer");
-				DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-				out.writeUTF("Hello from server - you are client#" + clientNumber + "\nPlase enter your userName: ");
-				
-				DataInputStream in = new DataInputStream(socket.getInputStream());
-				String userName = in.readUTF();
-				System.out.println(userName);
-				
-				
-				out.writeUTF("Please enter your password:");
-				String password = in.readUTF();
-				System.out.println(password);
-				
-				String[] clientInfo = new String[2];
-				clientInfo[0] = userName;
-				clientInfo[1] = password;
-				
-				String valitationResult = loginManager.validateUserInfos(clientInfo);
-				
-				if(valitationResult == "success" || valitationResult == "account created") {
-					out.writeUTF("Successfully connected to chat-room !");
-				}
-				else {
-					out.writeUTF("Wrong password !");
-				}
-				
-				//this.loginManager.compareData(clientInfo, socket.getInetAddress(), socket.getPort());
-				System.out.print("cancer");
-
-				
-			}
-			catch (IOException e){
-				
-				System.out.println("Error handling client#" + clientNumber + ":" + e);
-			}
-			finally {
-				try {
-					socket.close();
-				}
-				catch(IOException e) {
-					System.out.println("Couldn't close a socket, what's going on?");
-				}
-				System.out.println("Connection with client#" + clientNumber + "closed");
-			}
-		}
-		
-	}
 }
+
+
 
 		
 		
