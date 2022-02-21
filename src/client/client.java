@@ -12,6 +12,9 @@ import java.util.Scanner;
 public class client {
 	private static Scanner inputScanner = new Scanner(System.in);
 	public static Socket socket;
+	private DataInputStream in;
+	private DataOutputStream out;
+	String[] loginInfo = new String[4];;
 	private LoginManager loginManager = new LoginManager();
 	
 	
@@ -20,16 +23,15 @@ public class client {
 		try {
 			PrintWriter out = new PrintWriter(System.out);
 			Scanner in = new Scanner(System.in);
-			String[] loginInfo = new String[4]; 
 		
 			System.out.println("Please Enter the servers ip address :)");
-			loginInfo[0] = in.nextLine();
+			this.loginInfo[0] = in.nextLine();
 			System.out.println(loginInfo[0]);
 			
 			this.loginManager.validateIP(loginInfo[0]);
 			System.out.println("Now, Please Enter the servers Port");
 			
-			loginInfo[1] = in.nextLine();
+			this.loginInfo[1] = in.nextLine();
 			System.out.println(loginInfo[1]);
 			this.loginManager.validatePort(loginInfo[1]);
 		
@@ -42,60 +44,87 @@ public class client {
 		return null;
 		
 	}
-	/*
-	public void sendLoginInfo(Socket socket, String[] loginInfo) throws IOException {
-		PrintWriter out = new PrintWriter(socket.getOutputStream());
-		
-		for (int i = 0; i < loginInfo.length; i++) {
-			out.println(loginInfo[i]);
-			
-		}
-	}
-	*/
+	
 	/* Application Client */
 	
-	private static void logIn() throws Exception{
+	private void logIn() throws Exception{
 		
-		DataInputStream in = new DataInputStream(socket.getInputStream());
-		System.out.println(in.readUTF());
+		this.in = new DataInputStream(socket.getInputStream());
+		System.out.println(this.in.readUTF());
 		String username = inputScanner.nextLine();
 		
-		DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-		out.writeUTF(username);
+		this.out = new DataOutputStream(socket.getOutputStream());
+		this.out.writeUTF(username);
 		
-		System.out.print(in.readUTF());
+		System.out.print(this.in.readUTF());
 		String password = inputScanner.nextLine();
-		out.writeUTF(password);
+		this.out.writeUTF(password);
 		
-		String helloMessageFromServer = in.readUTF();
+		String helloMessageFromServer = this.in.readUTF();
 		System.out.println(helloMessageFromServer);
 		
-		String loginResult = in.readUTF();
+		String loginResult = this.in.readUTF();
 		System.out.println(loginResult);
+		
+		enterRoom();
 		
 	}
 	
+	private void sendMessage() {
+		try {
+			String message;
+			while(socket.isConnected()) {
+				message = inputScanner.nextLine();
+				out.writeUTF(message);
+				out.flush();
+			}
+		} catch (IOException e) {
+			endConnection();
+		}
+		
+	}
+	private void enterRoom() throws Exception{
+		
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while(socket.isConnected()) {
+					try {
+						String message = in.readUTF();
+						System.out.println(message);
+					} catch (IOException e) {
+						endConnection();
+					}
+				}
+				
+			}
+		}).start();
+		
+		sendMessage();
+		
+	}
+
+	public void endConnection() {
+		try {
+			if(this.in != null) this.in.close();
+			if( this.out != null) this.out.close();
+			if (socket != null) socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	public static void main(String[] args) throws Exception {
 		client client = new client();
 		
-		String[] loginInfo = client.initialValidation();
+		String[] validationInfo = client.initialValidation();
 		
-		// Addresse et port du serveur
-		String serverAddress = loginInfo[0];
-		int port = Integer.parseInt(loginInfo[1]);
-		
-		// Création d'une nouvelle connexion avec le serveur
+		String serverAddress = validationInfo[0];
+		int port = Integer.parseInt(validationInfo[1]);
 		socket = new Socket(serverAddress, port);
 		
 		System.out.format("The server is running on %s:%d%n", serverAddress, port);
 		
-		//client.sendLoginInfo(socket, loginInfo);
 		client.logIn();
 		
-		//socket.close();
-		
-		while(true) {
-			
-		}
 	}
 }

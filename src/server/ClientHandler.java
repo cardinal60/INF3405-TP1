@@ -55,6 +55,7 @@ public class ClientHandler implements Runnable {
 			}
 			else {
 				this.out.writeUTF("Wrong password !");
+				deleteClientHandler();
 			}
 			
 			//this.loginManager.compareData(clientInfo, socket.getInetAddress(), socket.getPort());
