@@ -1,20 +1,16 @@
 package server;
 
-import java.util.ArrayList;
+
 import java.util.Scanner;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
+
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.net.Socket;
 
-public class server {
+
+public class Server {
 	private LoginManager loginManager = new LoginManager();
 	public static ServerSocket listener;
-	private static Scanner userInput = new Scanner(System.in);
 	
 	private String[] initialValidation() {
 		try {
@@ -37,6 +33,7 @@ public class server {
 		serverInfo[1] = serverPort;
 		
 		this.loginManager.validatePort(serverPort);
+		input.close();
 		
 		return serverInfo;
 			
@@ -52,9 +49,11 @@ public class server {
 	
 	public static void main(String[] args) throws Exception {
 		// Compteur incrémenté à chaque connexion d'un client au serveur 
-		server server = new server();
+		Server server = new Server();
 		int clientNumber = 0;
 		String[] serverInfo = server.initialValidation();
+		// String serverAddress = "127.0.0.3";
+		// int port = 5000;
 		listener = new ServerSocket();
 		listener.setReuseAddress(true);
 		listener.bind(new InetSocketAddress(InetAddress.getByName(serverInfo[0]), Integer.parseInt(serverInfo[1])));		

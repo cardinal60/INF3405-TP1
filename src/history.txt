@@ -1,0 +1,3 @@
+[walrus - 127.0.0.3:5000 - 2022/02/22 @ 04:11:01]: allo, cher walrus
+[roger - 127.0.0.3:5000 - 2022/02/22 @ 04:11:17]: Bonjour roger, comment te porte-tu?
+[walrus - 127.0.0.3:5000 - 2022/02/22 @ 04:11:23]: tres bien mon cher

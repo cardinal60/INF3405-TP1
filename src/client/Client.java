@@ -1,15 +1,15 @@
 package client;
 
-import java.io.BufferedReader;
+
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;  
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class client {
+public class Client {
 	private static Scanner inputScanner = new Scanner(System.in);
 	public static Socket socket;
 	private DataInputStream in;
@@ -21,19 +21,17 @@ public class client {
 	
 	private String[] initialValidation() {
 		try {
-			PrintWriter out = new PrintWriter(System.out);
 			Scanner in = new Scanner(System.in);
 		
 			System.out.println("Please Enter the servers ip address :)");
 			this.loginInfo[0] = in.nextLine();
-			System.out.println(loginInfo[0]);
 			
 			this.loginManager.validateIP(loginInfo[0]);
 			System.out.println("Now, Please Enter the servers Port");
 			
 			this.loginInfo[1] = in.nextLine();
-			System.out.println(loginInfo[1]);
 			this.loginManager.validatePort(loginInfo[1]);
+			// in.close();
 		
 			return loginInfo;
 				
@@ -48,13 +46,13 @@ public class client {
 	/* Application Client */
 	
 	private void logIn() throws Exception{
-		
+
 		this.in = new DataInputStream(socket.getInputStream());
 		System.out.println(this.in.readUTF());
-		String username = inputScanner.nextLine();
+		this.loginInfo[2] = inputScanner.nextLine();
 		
 		this.out = new DataOutputStream(socket.getOutputStream());
-		this.out.writeUTF(username);
+		this.out.writeUTF(this.loginInfo[2]);
 		
 		System.out.print(this.in.readUTF());
 		String password = inputScanner.nextLine();
@@ -66,8 +64,35 @@ public class client {
 		String loginResult = this.in.readUTF();
 		System.out.println(loginResult);
 		
+		Scanner scanner = new Scanner(in);
+		String line;
+		boolean thirdTime = true;
+		int i = 0;
+		while(scanner.hasNextLine() && thirdTime) {
+			i++;
+			line = scanner.nextLine();
+			String response = line;
+			if( i == 3) {
+				break;
+			}
+			if(response == "END") {
+				System.out.println("broken");
+				break;
+			}
+			System.out.println(line);
+		}
+		scanner.close();
+		
+		System.out.println("Hurray");
 		enterRoom();
 		
+	}
+	
+	private String addHeader() {
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd @ HH:mm:ss");
+		LocalDateTime now = LocalDateTime.now();
+		String loginHeader =  "[" + this.loginInfo[2] + " - " + loginInfo[0] + ":" + loginInfo[1] + " - ";
+		return loginHeader + dtf.format(now) + "]: ";
 	}
 	
 	private void sendMessage() {
@@ -75,6 +100,7 @@ public class client {
 			String message;
 			while(socket.isConnected()) {
 				message = inputScanner.nextLine();
+				message = this.addHeader() + message;
 				out.writeUTF(message);
 				out.flush();
 			}
@@ -84,6 +110,7 @@ public class client {
 		
 	}
 	private void enterRoom() throws Exception{
+		this.in = new DataInputStream(socket.getInputStream());
 		
 		new Thread(new Runnable() {
 			@Override
@@ -114,7 +141,7 @@ public class client {
 		}
 	}
 	public static void main(String[] args) throws Exception {
-		client client = new client();
+		Client client = new Client();
 		
 		String[] validationInfo = client.initialValidation();
 		
@@ -128,3 +155,4 @@ public class client {
 		
 	}
 }
+

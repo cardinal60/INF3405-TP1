@@ -48,7 +48,7 @@ public class LoginManager {
 	
 	public void validatePort(String port) throws InvalidPortException {
 		int givenPort = Integer.parseInt(port);
-		boolean invalidPort = givenPort <= 5000 || givenPort >= 5050;
+		boolean invalidPort = givenPort < 5000 || givenPort > 5050;
 		
 		if(invalidPort) {
 			throw new InvalidPortException("given Port is not recognised please check the port number");
@@ -96,11 +96,11 @@ public class LoginManager {
 				*/
 				File myObj = new File("src/accounts.txt");
 			      Scanner myReader = new Scanner(myObj);
+			      
 				
 				while ( myReader.hasNextLine())   {
 					line = myReader.nextLine();
 					String[] s = line.split(":");
-				  System.out.println (line);
 				  
 				  if(s[0].equals(userName)) {
 					  if (s[1].equals(password)) {
@@ -108,11 +108,15 @@ public class LoginManager {
 					  }
 					  return "wrong password";
 					}
-				  
 				}
+				
 				if(!userFound) {
-					BufferedWriter writer = new BufferedWriter(new FileWriter("src/accounts.txt"));
-				    writer.write(userName + ":" + password);
+					BufferedWriter writer = new BufferedWriter(new FileWriter("src/accounts.txt", true));
+						writer.write(userName + ":" + password);
+						writer.newLine();
+						writer.close();
+				
+				    
 				    writer.close();
 				    return "account created";
 				}
