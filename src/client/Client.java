@@ -64,26 +64,12 @@ public class Client {
 		String loginResult = this.in.readUTF();
 		System.out.println(loginResult);
 		
-		Scanner scanner = new Scanner(in);
 		String line;
-		boolean thirdTime = true;
-		int i = 0;
-		while(scanner.hasNextLine() && thirdTime) {
-			i++;
-			line = scanner.nextLine();
-			String response = line;
-			if( i == 3) {
-				break;
-			}
-			if(response == "END") {
-				System.out.println("broken");
-				break;
-			}
+		while(this.in.available() > 0) {
+			line = this.in.readUTF();
 			System.out.println(line);
 		}
-		scanner.close();
 		
-		System.out.println("Hurray");
 		enterRoom();
 		
 	}
@@ -91,7 +77,7 @@ public class Client {
 	private String addHeader() {
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd @ HH:mm:ss");
 		LocalDateTime now = LocalDateTime.now();
-		String loginHeader =  "[" + this.loginInfo[2] + " - " + loginInfo[0] + ":" + loginInfo[1] + " - ";
+		String loginHeader =  "[" + this.loginInfo[2] + " - " + loginInfo[0] + ":" + String.valueOf(socket.getLocalPort()) + " - ";
 		return loginHeader + dtf.format(now) + "]: ";
 	}
 	
@@ -101,6 +87,7 @@ public class Client {
 			while(socket.isConnected()) {
 				message = inputScanner.nextLine();
 				message = this.addHeader() + message;
+				System.out.println("\r" + message);
 				out.writeUTF(message);
 				out.flush();
 			}

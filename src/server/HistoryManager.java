@@ -33,17 +33,13 @@ public class HistoryManager {
 			in.close();
 			
 			
-			if( this.historyList.length >= 15) {
-				String[] newArray = new String[15];
-				for(int j = 1; j < this.historyList.length; i++) {
-					newArray[i - 1] = this.historyList[i];
+			if(this.historyList[14] != null) {
+				for(int k = 1; k < this.historyList.length; k++){
+				      this.historyList[k - 1] = this.historyList[k];
+				   }
+				this.historyList[14] = null;
 				}
-				
-				this.historyList = Arrays.copyOf(newArray, 15);
-			}
-			
 			this.writeMessage(message);
-			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -51,16 +47,22 @@ public class HistoryManager {
 	}
 		
 		
-	private void writeMessage(String message) {
+	public void writeMessage(String message) {
 		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter("src/history.txt", true));
+			BufferedWriter writer = new BufferedWriter(new FileWriter("src/history.txt"));
 			for(int i = 0; i< this.historyList.length; i++) {
-				writer.write(this.historyList[i]  + "\n");
-				writer.newLine();
+				if( historyList[i] != null) {
+					writer.write(this.historyList[i]);
+					writer.newLine();
+				}
 			}
-			writer.write(message);
-			writer.newLine();
 			writer.close();
+			
+			BufferedWriter messageWriter = new BufferedWriter(new FileWriter("src/history.txt", true));
+			messageWriter.write(message);
+			messageWriter.newLine();
+			messageWriter.close();
+			
 
 		} catch (IOException e) {
 			e.printStackTrace();

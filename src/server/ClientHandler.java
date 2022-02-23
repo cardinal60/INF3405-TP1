@@ -114,8 +114,7 @@ public class ClientHandler implements Runnable {
 						if(history[i] != null) {
 							handler.out.writeUTF(history[i] + "\n");
 						}
-						//handler.out.flush();
-						handler.out.writeUTF("END");
+						handler.out.flush();
 					}
 					
 				}
