@@ -1,9 +1,4 @@
 package client;
-import java.util.Scanner;
-import java.io.DataOutputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.net.InetAddress;
 
 public class LoginManager {
 	

@@ -22,7 +22,7 @@ public class ClientHandler implements Runnable {
 		this.clientNumber = clientNumber;
 		this.loginManager = new LoginManager();
 		this.historyManager = new HistoryManager();
-		this.clientHandlers.add(this);
+		clientHandlers.add(this);
 		System.out.println("New connection with client#" + clientNumber + "at" + socket);
 		///this.run();
 	}
@@ -69,6 +69,7 @@ public class ClientHandler implements Runnable {
 		}
 		finally {
 			try {
+				deleteClientHandler();
 				socket.close();
 				System.out.println("Connection with client#" + clientNumber + "closed");
 			}
@@ -125,8 +126,8 @@ public class ClientHandler implements Runnable {
 	}
 	
 	private void deleteClientHandler() {
-		clientHandlers.remove(this);
 		broadcastMessage(this.clientInfo[0] + " has left the chat");
+		clientHandlers.remove(this);
 		try {
 			if(this.in != null) in.close();
 			if( this.out != null) out.close();

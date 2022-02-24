@@ -1,21 +1,15 @@
 package server;
 import java.util.Scanner;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 
 public class LoginManager {
 	public ServerSocket socket;
+	private Scanner myReader;
 	
 	LoginManager(){}
 	
@@ -95,7 +89,7 @@ public class LoginManager {
 				for(String fileNames : file.list()) System.out.println(fileNames);
 				*/
 				File myObj = new File("src/accounts.txt");
-			      Scanner myReader = new Scanner(myObj);
+			       this.myReader = new Scanner(myObj);
 			      
 				
 				while ( myReader.hasNextLine())   {
@@ -115,19 +109,15 @@ public class LoginManager {
 						writer.write(userName + ":" + password);
 						writer.newLine();
 						writer.close();
-				
-				    
-				    writer.close();
 				    return "account created";
 				}
-				myReader.close();
 				
 				return "success";
 			} catch (IOException e){
 				System.out.println(e);
 			}
 			finally {
-				
+				this.myReader.close();
 			}
 
 			return null;

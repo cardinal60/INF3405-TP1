@@ -10,26 +10,30 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class Client {
-	private static Scanner inputScanner = new Scanner(System.in);
+	private Scanner inputScanner;
 	public static Socket socket;
 	private DataInputStream in;
 	private DataOutputStream out;
-	String[] loginInfo = new String[4];;
+	String[] loginInfo = new String[4];
 	private LoginManager loginManager = new LoginManager();
+	
+	
+	Client() {
+		this.inputScanner = new Scanner(System.in);
+	}
 	
 	
 	
 	private String[] initialValidation() {
 		try {
-			Scanner in = new Scanner(System.in);
 		
 			System.out.println("Please Enter the servers ip address :)");
-			this.loginInfo[0] = in.nextLine();
+			this.loginInfo[0] = this.inputScanner.nextLine();
 			
 			this.loginManager.validateIP(loginInfo[0]);
 			System.out.println("Now, Please Enter the servers Port");
 			
-			this.loginInfo[1] = in.nextLine();
+			this.loginInfo[1] = this.inputScanner.nextLine();
 			this.loginManager.validatePort(loginInfo[1]);
 			// in.close();
 		
@@ -86,6 +90,11 @@ public class Client {
 			String message;
 			while(socket.isConnected()) {
 				message = inputScanner.nextLine();
+				int maxLenght = 200;
+				if (message.length() > maxLenght) {
+					System.out.println("Your message is too long, please try again with a shorter message");
+					this.sendMessage();
+				}
 				message = this.addHeader() + message;
 				System.out.println("\r" + message);
 				out.writeUTF(message);
@@ -139,6 +148,8 @@ public class Client {
 		System.out.format("The server is running on %s:%d%n", serverAddress, port);
 		
 		client.logIn();
+		
+		client.inputScanner.close();
 		
 	}
 }
